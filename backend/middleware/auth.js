@@ -8,8 +8,8 @@ function authMiddleware(req, res, next) {
 //   const user = db.prepare('SELECT * FROM users WHERE token = ?').get(token);
 //   if (!user) return res.status(403).json({ error: 'Invalid token' });
 
-//   req.user = user;
-  next();
+    req.user = 1;
+    next();
 }
 
 module.exports = authMiddleware;

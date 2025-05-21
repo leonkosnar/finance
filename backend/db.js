@@ -1,33 +1,45 @@
+const fs = require('fs');
+const path = require('path');
 const Database = require('better-sqlite3');
-const db = new Database(':memory:');
 
-// Create schema
-db.exec(`
-  CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    token TEXT UNIQUE
-  );
-  CREATE TABLE accounts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    balance REAL,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-  );
-  CREATE TABLE transactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    source_account INTEGER,
-    destination_account INTEGER,
-    amount REAL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-`);
+// Persistent DB file
+const DB_FILE = path.join(__dirname, 'bank.db');
+const isNew = !fs.existsSync(DB_FILE);
 
-// Seed sample user and accounts
-const insertUser = db.prepare('INSERT INTO users (name, token) VALUES (?, ?)');
-const userInfo = insertUser.run('Alice', 'token123');
+const db = new Database(DB_FILE);
 
-const insertAccount = db.prepare('INSERT INTO accounts (user_id, balance) VALUES (?, ?)');
-insertAccount.run(userInfo.lastInsertRowid, 1000);
+// Create tables only if the DB is new
+if (isNew) {
+  db.exec(`
+    CREATE TABLE users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      token TEXT UNIQUE
+    );
+    CREATE TABLE accounts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      balance REAL,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    );
+    CREATE TABLE transactions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      source_account INTEGER,
+      destination_account INTEGER,
+      amount REAL,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Seed user and account
+  const insertUser = db.prepare('INSERT INTO users (name, token) VALUES (?, ?)');
+  const userInfo = insertUser.run('Alice', 'token123');
+
+  const insertAccount = db.prepare('INSERT INTO accounts (user_id, balance) VALUES (?, ?)');
+  insertAccount.run(userInfo.lastInsertRowid, 1000);
+  insertAccount.run(userInfo.lastInsertRowid, 500); // Add a second account for transfer testing
+
+  console.log('Database initialized with sample data.');
+}
 
 module.exports = db;
