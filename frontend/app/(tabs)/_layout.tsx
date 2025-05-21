@@ -30,15 +30,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons name="home" size={32} color={color} />,
+          title: 'Konten',
+          tabBarIcon: ({ color }) => <Ionicons name="wallet" size={32} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="goals"
+        options={{
+          title: 'Konten',
+          tabBarIcon: ({ color }) => <Ionicons name="medal" size={32} color={color} />,
         }}
       />
       <Tabs.Screen
         name="accounts"
         options={{
-          title: 'Konten',
-          tabBarIcon: ({ color }) => <Ionicons name="wallet" size={32} color={color} />,
+          title: 'Account',
+          tabBarIcon: ({ color }) => <Ionicons name="person" size={32} color={color} />,
         }}
       />
     </Tabs>
