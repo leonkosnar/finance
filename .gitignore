@@ -1,3 +1,6 @@
+# Apple misc
+.DS_Store
+
 # Database
 *.db
 

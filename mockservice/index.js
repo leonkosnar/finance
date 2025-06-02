@@ -1,16 +1,18 @@
 const express = require('express');
-const auth = require('./middleware/auth');
+const login = require('./routes/login');
 const accounts = require('./routes/accounts');
 const transfer = require('./routes/transfer');
 
 const app = express();
 app.use(express.json());
-app.use(auth); // apply to all routes
 
+app.get('/service', (req, res)=>{
+  res.status(200).json({"service": "super bank api"})
+});
+app.use(login);
 app.use(accounts);
 app.use(transfer);
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Bank API running on http://localhost:${PORT}`);
+app.listen(3000, () => {
+  console.log('BANK running at http://localhost:3000');
 });

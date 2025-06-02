@@ -3,7 +3,7 @@ const path = require('path');
 const Database = require('better-sqlite3');
 
 // Persistent DB file
-const DB_FILE = path.join(__dirname, 'bank.db');
+const DB_FILE = path.join(__dirname, 'database.db');
 const isNew = !fs.existsSync(DB_FILE);
 
 const db = new Database(DB_FILE);
@@ -14,7 +14,7 @@ if (isNew) {
     CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
-      token TEXT UNIQUE
+      password  TEXT
     );
     CREATE TABLE accounts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,8 +32,8 @@ if (isNew) {
   `);
 
   // Seed user and account
-  const insertUser = db.prepare('INSERT INTO users (name, token) VALUES (?, ?)');
-  const userInfo = insertUser.run('Alice', 'token123');
+  const insertUser = db.prepare('INSERT INTO users (name, password) VALUES (?, ?)');
+  const userInfo = insertUser.run('Alice', 'password');
 
   const insertAccount = db.prepare('INSERT INTO accounts (user_id, balance) VALUES (?, ?)');
   insertAccount.run(userInfo.lastInsertRowid, 1000);
