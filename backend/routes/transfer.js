@@ -2,6 +2,8 @@ const express = require('express');
 const db = require('../db');
 const router = express.Router();
 
+// TODO adapt to use mock service
+
 router.post('/transfer', (req, res) => {
   const { source_account, destination_account, amount } = req.body;
   if (!source_account || !destination_account || !amount) {

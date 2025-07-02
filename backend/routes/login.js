@@ -7,6 +7,8 @@ const router = express.Router();
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
 
+  // {username: "Alice", password: "password"}
+
   const user = db.prepare('SELECT * FROM users WHERE name = ?').get(username);
 
   if (!user || password !== user.password) {

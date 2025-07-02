@@ -8,7 +8,7 @@ function authMiddleware(req, res, next) {
     const token = authHeader.split(' ')[1];
 
     try {
-        const payload = jwt.verify(token, "secret123");
+        const payload = jwt.verify(token, "secret123"); //TODO use env
         req.user = payload.id;
         next();
     } catch (err) {

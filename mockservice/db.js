@@ -14,7 +14,7 @@ if (isNew) {
     CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
-      password  TEXT
+      api_key  TEXT
     );
     CREATE TABLE accounts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,8 +32,8 @@ if (isNew) {
   `);
 
   // Seed user and account
-  const insertUser = db.prepare('INSERT INTO users (name, password) VALUES (?, ?)');
-  const userInfo = insertUser.run('Alice', 'password');
+  const insertUser = db.prepare('INSERT INTO users (name, api_key) VALUES (?, ?)');
+  const userInfo = insertUser.run('Alice', 'abc123');
 
   const insertAccount = db.prepare('INSERT INTO accounts (user_id, balance) VALUES (?, ?)');
   insertAccount.run(userInfo.lastInsertRowid, 1000);
