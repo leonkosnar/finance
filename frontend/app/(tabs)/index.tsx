@@ -1,73 +1,63 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
+import { Image, StyleSheet, View, Text } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import Card from '@/components/Card';
 
 export default function HomeScreen() {
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: '#0B3043', dark: '#0B3043' }}
       headerImage={
-        <Image
-          source={require('@/assets/images/logo.png')}
-          style={styles.reactLogo}
+        <View style={styles.headerImageContainer}>
+          <Text style={styles.headerText}>Konten</Text>
+        </View>
+      }
+    >
+      <View style={styles.container}>
+        <Card
+          title="Hauptkonto"
+          amount="3.072,32 €"
+          color="#F3A97D"
+          entries={[
+            { label: 'Max Mustermann', value: '-364,30 €' },
+            { label: 'Lisa Huber', value: '492,00 €' },
+            { label: 'Nina Chuba', value: '-615,83 €' },
+          ]}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Spaces</ThemedText>
-      </ThemedView>
-      {/* <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView> */}
+        <Card
+          title="Sparen für Urlaub"
+          amount="5.200,00 €"
+          color="#3EA4A8"
+          entries={[
+            { label: 'Mai', value: '600,00 €' },
+            { label: 'April', value: '600,00 €' },
+            { label: 'März', value: '600,00 €' },
+          ]}
+        />
+      </View>
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  header: {
+    backgroundColor: '#A85757',
+    paddingTop: 70,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  headerImageContainer: {
     position: 'absolute',
+    bottom: 20,
+    left: 15,
+    right: 0,
+    alignItems: 'flex-start',
   },
+  headerText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  container: {
+    gap: 8,
+  }
 });
