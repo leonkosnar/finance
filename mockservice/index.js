@@ -1,4 +1,5 @@
 const express = require('express');
+const login = require('./routes/login');
 const accounts = require('./routes/accounts');
 const transfer = require('./routes/transfer');
 
@@ -8,6 +9,7 @@ app.use(express.json());
 app.get('/service', (req, res)=>{
   res.status(200).json({"service": "super bank api"})
 });
+app.use(login);
 app.use(accounts);
 app.use(transfer);
 

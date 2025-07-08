@@ -1,19 +1,17 @@
-const db = require('../db');
+const jwt = require('jsonwebtoken');
 
 function authMiddleware(req, res, next) {
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer '))
-        return res.status(401).json({ error: 'Missing or malformed api-key' });
+        return res.status(401).json({ error: 'Missing or malformed token' });
 
-    const api_key = authHeader.split(' ')[1];
+    const token = authHeader.split(' ')[1];
 
     try {
-        const user = db.prepare('SELECT * FROM users WHERE api_key = ?').get(api_key);
-        if (!user) throw new Error('Login failed');
-        req.user = user.id;
+        const payload = jwt.verify(token, "secret321"); //TODO use env
+        req.user = payload.id;
         next();
     } catch (err) {
-        console.log("AUTH failed", err)
         return res.status(403).json({ error: 'Invalid or expired token' });
     }
 }

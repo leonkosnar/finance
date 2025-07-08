@@ -13,15 +13,14 @@ if (isNew) {
   db.exec(`
     CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT,
-      password  TEXT,
-      api_key TEXT
+      username TEXT,
+      password  TEXT
     );
   `);
 
   // Seed user and account
-  const insertUser = db.prepare('INSERT INTO users (name, password, api_key) VALUES (?, ?, ?)');
-  const userInfo = insertUser.run('Alice', 'password', 'abc123');
+  const insertUser = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+  const userInfo = insertUser.run('alice', 'password');
 
   console.log('Database initialized with sample data.');
 }
