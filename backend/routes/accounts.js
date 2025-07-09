@@ -6,17 +6,17 @@ const router = express.Router();
 
 router.get('/account', auth, async (req, res) => {
     try {
-        const result = db.prepare('SELECT api_key FROM users WHERE id = ?').all(req.user);
-        if (!result.length || !result[0]?.api_key) throw new Error("no api_key found");
-
-        const api_key = result[0].api_key;
+        const jwt = req.bank_jwt;
         const response = await fetch('http://localhost:3001/account', {
             headers: {
-                'Authorization': `Bearer ${api_key}`
+                'Authorization': `Bearer ${jwt}`
             }
         });
 
-        if (!response.ok) throw new Error('Bank service failed');
+        if (!response.ok) {
+            console.log(response.status, response);
+            throw new Error('Bank service failed');
+        };
 
         const bankData = await response.json();
 
@@ -24,7 +24,7 @@ router.get('/account', auth, async (req, res) => {
         res.json(bankData);
 
     } catch (err) {
-        console.dir(err, {depth:null})
+        console.dir(err, { depth: null })
         console.error(err.message);
         res.status(500).json({ error: 'Internal server error' });
     }

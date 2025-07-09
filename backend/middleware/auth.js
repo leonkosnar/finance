@@ -10,6 +10,7 @@ function authMiddleware(req, res, next) {
     try {
         const payload = jwt.verify(token, "secret123"); //TODO use env
         req.user = payload.id;
+        req.bank_jwt = payload.bank_jwt;
         next();
     } catch (err) {
         return res.status(403).json({ error: 'Invalid or expired token' });
