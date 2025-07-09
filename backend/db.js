@@ -12,15 +12,15 @@ const db = new Database(DB_FILE);
 if (isNew) {
   db.exec(`
     CREATE TABLE users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY,
       username TEXT,
       password  TEXT
     );
   `);
 
   // Seed user and account
-  const insertUser = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-  const userInfo = insertUser.run('alice', 'password');
+  const insertUser = db.prepare('INSERT INTO users (id, username, password) VALUES (?, ?, ?)');
+  const userInfo = insertUser.run(1, 'alice', 'password');
 
   console.log('Database initialized with sample data.');
 }
