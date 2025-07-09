@@ -12,7 +12,7 @@ router.post('/login', async (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 
   if (!user || password !== user.password) {
-    return res.status(401).json({ error: 'Invalid credentials 1' });
+    return res.status(401).json({ error: 'Invalid credentials' });
   }
 
   const response = await fetch('http://localhost:3001/login', {
@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
   const loginData = await response.json();
   const bank_jwt = loginData.token;
 
-  const token = jwt.sign({ id: user.id, bank: bank_jwt }, "secret123", { // TODO use env
+  const token = jwt.sign({ id: user.id, bank_jwt: bank_jwt }, "secret123", { // TODO use env
     expiresIn: '1d'
   });
 
