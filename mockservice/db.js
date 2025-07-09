@@ -12,13 +12,15 @@ const db = new Database(DB_FILE);
 if (isNew) {
   db.exec(`
     CREATE TABLE users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY,
       name TEXT,
       password  TEXT
     );
     CREATE TABLE accounts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY,
       user_id INTEGER,
+      name TEXT,
+      tag TEXT,
       balance REAL,
       FOREIGN KEY(user_id) REFERENCES users(id)
     );
@@ -26,18 +28,75 @@ if (isNew) {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       source_account INTEGER,
       destination_account INTEGER,
+      payment_ref TEXT,
       amount REAL,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
-  // Seed user and account
-  const insertUser = db.prepare('INSERT INTO users (name, password) VALUES (?, ?)');
-  const userInfo = insertUser.run('alice', 'pw123');
+  const tags = {
+    TRAVEL: "Reisen",
+    FOOD: "Essen und Trinken",
+    CLOTHES: "Shopping",
+    MEDIA: "Multimedia",
+    LEASURE: "Freizeit",
+    EDUCATION: "Bildung",
+    ONLINE: "Online Shopping",
+    TAXES: "Steuern",
+    TRANSFER: "Überweisung",
+    USER: "Nutzer",
+    OTHER: "Andere",
+  }
 
-  const insertAccount = db.prepare('INSERT INTO accounts (user_id, balance) VALUES (?, ?)');
-  insertAccount.run(userInfo.lastInsertRowid, 1000);
-  insertAccount.run(userInfo.lastInsertRowid, 500); // Add a second account for transfer testing
+  const vendors = [
+    { id: 101, name: 'FH Campus Wien', tag: tags.EDUCATION, options: [{ message: "Studienbeitrag", amt: -388.56 }] },
+    { id: 102, name: 'Uni Wien', tag: tags.EDUCATION, options: [{ message: "ÖH-Beitrag", amt: -25.20 }] },
+    { id: 103, name: 'Billa', tag: tags.FOOD, options: [{ message: "Danke für Ihren Einkauf", min: -5, max: -200 }] },
+    { id: 104, name: 'Spar', tag: tags.FOOD, options: [{ message: "Spar dankt", min: -5, max: -200 }] },
+    { id: 105, name: 'Leon', tag: tags.TRANSFER, options: [{ message: "Einkauf", min: -70, max: 70 }, { message: "Essen", min: -100, max: 100 }, { message: "Danke", min: -200, max: 200 }] },
+    { id: 106, name: 'Christopher', tag: tags.TRANSFER, options: [{ message: "Eis", min: -20, max: 20 }, { message: "Schwimmen", min: -15, max: 15 }, { message: "Tank", min: -50, max: 50 }, { message: "Danke", min: -500, max: 500 }] },
+    { id: 107, name: 'Finanzamt Wien', tag: tags.TAXES, options: [{ message: "Steuerrückzahlung", min: 100, max: 1000 }, { message: "Steuernachzahlung", min: -100, max: -1000 }] },
+    { id: 108, name: 'Cineplexx', tag: tags.LEASURE, options: [{ message: "Viel Spaß!", min: -5, max: -30 }] },
+    { id: 109, name: 'Amazon.at', tag: tags.ONLINE, options: [{ message: "Ihre Amazon AT Bestellung", min: -10, max: -100 }, { message: "Amazon AT Rückerstattung", min: 10, max: 100 }] },
+  ]
+
+  let prevDate = new Date(2025, 5, 1);
+  function randomDate() {
+    prevDate = new Date(prevDate.getTime() + Math.random() * 100_000_000);
+    return prevDate;
+  }
+
+  const getTransaction = (account_id) => {
+    const vendor = vendors[Math.floor(Math.random() * vendors.length)];
+    const scenario = vendor.options[Math.floor(Math.random() * vendor.options.length)]
+    // console.log(vendor?.name, scenario?.message, scenario?.amt, scenario?.min, scenario?.max)
+    const amount = scenario?.amt || Math.random() * (scenario.max - scenario.min) + scenario.min
+
+    return {
+      source_account: amount < 0 ? account_id : vendor.id,
+      destination_account: amount > 0 ? account_id : vendor.id,
+      amount: Math.abs(Math.round(amount * 100) / 100),
+      message: scenario.message,
+      timestamp: randomDate().toISOString()
+    }
+  }
+
+  // Seed user and account
+  const insertUser = db.prepare('INSERT INTO users (id, name, password) VALUES (?, ?, ?)');
+  insertUser.run(0, 'vendors', 'asdfghjkl');
+  insertUser.run(1, 'alice', 'pw123');
+  
+  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name, tag, balance) VALUES (?, ?, ?, ?, ?)');
+  insertAccount.run(1, 1, "Alice", tags.USER, 4590.43);
+  vendors.forEach(vendor => {
+    insertAccount.run(vendor.id, 0, vendor.name, vendor.tag, 0);
+  })
+  
+  const insertTransaction = db.prepare('INSERT INTO transactions (source_account, destination_account, payment_ref, amount, timestamp) VALUES (?, ?, ?, ?, ?)');
+  for(let i = 0; i < 100; i++){
+    const transaction = getTransaction(1)
+    insertTransaction.run(transaction.source_account, transaction.destination_account, transaction.message, transaction.amount, transaction.timestamp)
+  }
 
   console.log('Database initialized with sample data.');
 }
