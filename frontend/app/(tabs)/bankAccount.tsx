@@ -1,12 +1,19 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import Card from '@/components/Card';
+import React from "react";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
+import Card from "@/components/Card";
+import { useApi } from "@/hooks/useAPI";
 
 export default function BankAccountScreen() {
+  const {
+    data: accounts,
+    loading: accountsLoading,
+    error: accountsError,
+  } = useApi("http://localhost:3000/account");
+
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#0B3043', dark: '#0B3043' }}
+      headerBackgroundColor={{ light: "#0B3043", dark: "#0B3043" }}
       headerImage={
         <View style={styles.headerImageContainer}>
           <Text style={styles.headerText}>Konten</Text>
@@ -14,26 +21,31 @@ export default function BankAccountScreen() {
       }
     >
       <View style={styles.container}>
-        <Card
-          title="Hauptkonto"
-          amount="3.072,32 €"
-          color="#F3A97D"
-          entries={[
-            { label: 'Max Mustermann', value: '-364,30 €' },
-            { label: 'Lisa Huber', value: '492,00 €' },
-            { label: 'Nina Chuba', value: '-615,83 €' },
-          ]}
-        />
-        <Card
-          title="Sparen für Urlaub"
-          amount="5.200,00 €"
-          color="#3EA4A8"
-          entries={[
-            { label: 'Mai', value: '600,00 €' },
-            { label: 'April', value: '600,00 €' },
-            { label: 'März', value: '600,00 €' },
-          ]}
-        />
+        {accountsLoading && <ActivityIndicator size="large" />}
+        {accountsError && <Text style={{ color: "red" }}>{accountsError}</Text>}
+        {!accountsLoading &&
+          !accountsError &&
+          accounts.map(
+            (
+              account: {
+                id: number;
+                user_id: number;
+                name: string;
+                tag: string;
+                balance: number;
+                color: string;
+              },
+              idx: React.Key | null | undefined
+            ) => (
+              <Card
+                key={idx}
+                id={account.id}
+                title={account.name}
+                amount={account.balance}
+                color={account.color}
+              />
+            )
+          )}
       </View>
     </ParallaxScrollView>
   );
@@ -41,24 +53,24 @@ export default function BankAccountScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#A85757',
+    backgroundColor: "#A85757",
     paddingTop: 70,
     paddingBottom: 30,
     paddingHorizontal: 20,
   },
   headerImageContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     left: 15,
     right: 0,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
   headerText: {
     fontSize: 30,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   container: {
     gap: 8,
-  }
+  },
 });
