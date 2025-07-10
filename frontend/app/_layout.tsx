@@ -1,6 +1,6 @@
+import React, { useEffect } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';

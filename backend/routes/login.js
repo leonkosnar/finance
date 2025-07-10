@@ -12,6 +12,7 @@ router.post('/login', async (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 
   if (!user || password !== user.password) {
+    console.debug(`login attempt by ${username} failed due to invalid credentials`)
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
@@ -27,7 +28,7 @@ router.post('/login', async (req, res) => {
   });
 
   if (!response.ok) {
-    console.error("BANK service failed", response.status, response)
+    console.debug(`login attempt by ${username} failed due to bank (${response.status})`);
     throw new Error('Bank service failed');
   }
 
@@ -37,7 +38,7 @@ router.post('/login', async (req, res) => {
   const token = jwt.sign({ id: user.id, bank_jwt: bank_jwt }, "secret123", { // TODO use env
     expiresIn: '1d'
   });
-
+  console.debug(`login attempt by ${username} succeeded`);
   res.json({ token });
 });
 

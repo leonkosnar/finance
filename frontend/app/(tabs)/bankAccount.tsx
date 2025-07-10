@@ -1,3 +1,4 @@
+import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import Card from '@/components/Card';
