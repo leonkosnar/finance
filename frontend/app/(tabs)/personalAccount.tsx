@@ -1,8 +1,10 @@
-import { StyleSheet, View, TextInput, Text } from 'react-native';
+import { StyleSheet, View, TextInput, Text, Button } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import HeaderTitle from '@/components/HeaderTitle';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
-export default function AccountScreen() {
+export default function PersonalAccountScreen() {
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#55B86F', dark: '#55B86F' }}
@@ -11,6 +13,11 @@ export default function AccountScreen() {
       <View style={styles.container}>
         <TextInput style={styles.input} value="maximilian.muster@gmail.com" />
         <TextInput style={styles.input} value="abcdefg" secureTextEntry />
+
+        <Button title="Logout" onPress={async () => {
+          await AsyncStorage.removeItem('loggedIn');
+          router.replace('/login');
+        }} />
       </View>
     </ParallaxScrollView>
   );

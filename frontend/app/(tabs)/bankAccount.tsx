@@ -1,8 +1,8 @@
-import { Image, StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import Card from '@/components/Card';
 
-export default function HomeScreen() {
+export default function BankAccountScreen() {
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#0B3043', dark: '#0B3043' }}
