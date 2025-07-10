@@ -10,6 +10,7 @@ router.post('/login', async (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE name = ?').get(username);
 
   if (!user || password !== user.password) {
+    console.debug(user, password, user.password, password == user.password)
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 

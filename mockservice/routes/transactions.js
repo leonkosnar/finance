@@ -6,24 +6,29 @@ const auth = require('../middleware/auth');
 router.get('/transactions', auth, (req, res) => {
   const limit = req.query?.limit || 10;
   const offset = req.query?.offset || 0;
+  const last_id = req.query?.last_id || 0;
 
-  const transactions = db.prepare(`
+  const statement = [`
   SELECT
   t.id AS transaction_id,
   t.amount,
   t.timestamp,
-  t.payment_ref,
-  a_source.name AS source_name,
-  a_dest.name AS destination_name
-FROM
+  t.payment_ref as tag,
+  t.first_party,
+  a_dest.name AS second_party
+  FROM
   transactions t
-JOIN accounts a_source ON t.source_account = a_source.id
-JOIN accounts a_dest ON t.destination_account = a_dest.id
-WHERE
-  a_source.user_id = ? OR a_dest.user_id = ?
+  JOIN accounts a_source ON t.first_party = a_source.id
+  JOIN accounts a_dest ON t.second_party = a_dest.id
+  WHERE
+  t.first_party = ? OR t.second_party = ?
   LIMIT ? 
   OFFSET ?
-  `).all(req.user, req.user, limit, offset);
+  `].join("");
+
+  console.debug(statement)
+
+  const transactions = db.prepare(statement).all(req.user, req.user, limit, offset);
   res.json(transactions);
 });
 

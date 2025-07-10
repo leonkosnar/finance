@@ -21,16 +21,17 @@ if (isNew) {
       user_id INTEGER,
       name TEXT,
       tag TEXT,
-      balance REAL,
       FOREIGN KEY(user_id) REFERENCES users(id)
     );
     CREATE TABLE transactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      source_account INTEGER,
-      destination_account INTEGER,
+      first_party INTEGER,
+      second_party INTEGER,
       payment_ref TEXT,
       amount REAL,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(first_party) REFERENCES accounts(id)
+      FOREIGN KEY(second_party) REFERENCES accounts(id)
     );
   `);
 
@@ -45,6 +46,7 @@ if (isNew) {
     TAXES: "Steuern",
     TRANSFER: "Überweisung",
     USER: "Nutzer",
+    SALARY: "Gehalt",
     OTHER: "Andere",
   }
 
@@ -58,6 +60,8 @@ if (isNew) {
     { id: 107, name: 'Finanzamt Wien', tag: tags.TAXES, options: [{ message: "Steuerrückzahlung", min: 100, max: 1000 }, { message: "Steuernachzahlung", min: -100, max: -1000 }] },
     { id: 108, name: 'Cineplexx', tag: tags.LEASURE, options: [{ message: "Viel Spaß!", min: -5, max: -30 }] },
     { id: 109, name: 'Amazon.at', tag: tags.ONLINE, options: [{ message: "Ihre Amazon AT Bestellung", min: -10, max: -100 }, { message: "Amazon AT Rückerstattung", min: 10, max: 100 }] },
+    { id: 201, name: 'Goodle', tag: tags.SALARY, options: [{ message: "Ihr Gehalt für diesen Monat", min: 5000, max: 10000 }, { message: "Überstunden", min: 400, max: 10000 }] },
+    { id: 202, name: 'Apple', tag: tags.SALARY, options: [{ message: "Nicht Alles auf Einmal ausgeben", min: 4000, max: 12000 }, { message: "Überstunden", min: 200, max: 8000 }] },
   ]
 
   let prevDate = new Date(2025, 5, 1);
@@ -66,17 +70,17 @@ if (isNew) {
     return prevDate;
   }
 
-  const getTransaction = (account_id) => {
+  const getTransaction = (first_party) => {
     const vendor = vendors[Math.floor(Math.random() * vendors.length)];
     const scenario = vendor.options[Math.floor(Math.random() * vendor.options.length)]
     // console.log(vendor?.name, scenario?.message, scenario?.amt, scenario?.min, scenario?.max)
     const amount = scenario?.amt || Math.random() * (scenario.max - scenario.min) + scenario.min
 
     return {
-      source_account: amount < 0 ? account_id : vendor.id,
-      destination_account: amount > 0 ? account_id : vendor.id,
-      amount: Math.abs(Math.round(amount * 100) / 100),
-      message: scenario.message,
+      first_party: first_party,
+      second_party: vendor.id,
+      amount: Math.round(amount * 100) / 100,
+      message: vendor.tag,
       timestamp: randomDate().toISOString()
     }
   }
@@ -84,20 +88,25 @@ if (isNew) {
   // Seed user and account
   const insertUser = db.prepare('INSERT INTO users (id, name, password) VALUES (?, ?, ?)');
   insertUser.run(0, 'vendors', 'asdfghjkl');
-  insertUser.run(1, 'alice', 'pw123');
+  insertUser.run(1, 'max', 'max');
+  insertUser.run(2, 'anna', 'anna');
   
-  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name, tag, balance) VALUES (?, ?, ?, ?, ?)');
-  insertAccount.run(1, 1, "Alice", tags.USER, 4590.43);
+  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name, tag) VALUES (?, ?, ?, ?)');
+  insertAccount.run(1, 1, "Girokonto", tags.USER);
+  insertAccount.run(2, 2, "Girokonto", tags.USER);
   vendors.forEach(vendor => {
-    insertAccount.run(vendor.id, 0, vendor.name, vendor.tag, 0);
+    insertAccount.run(vendor.id, 0, vendor.name, vendor.tag);
   })
   
-  const insertTransaction = db.prepare('INSERT INTO transactions (source_account, destination_account, payment_ref, amount, timestamp) VALUES (?, ?, ?, ?, ?)');
+  const insertTransaction = db.prepare('INSERT INTO transactions (first_party, second_party, payment_ref, amount, timestamp) VALUES (?, ?, ?, ?, ?)');
   for(let i = 0; i < 100; i++){
     const transaction = getTransaction(1)
+    insertTransaction.run(transaction.first_party, transaction.second_party, transaction.message, transaction.amount, transaction.timestamp)
+  }
+  for(let i = 0; i < 20; i++){
+    const transaction = getTransaction(2)
     insertTransaction.run(transaction.source_account, transaction.destination_account, transaction.message, transaction.amount, transaction.timestamp)
   }
-
   console.log('Database initialized with sample data.');
 }
 

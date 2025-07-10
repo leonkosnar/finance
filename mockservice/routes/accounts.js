@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get('/account', auth, (req, res) => {
     const accounts = db.prepare('SELECT * FROM accounts WHERE user_id = ?').all(req.user);
+    console.debug(`accessing account `)
     res.json(accounts);
 });
 

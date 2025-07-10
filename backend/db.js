@@ -16,11 +16,58 @@ if (isNew) {
       username TEXT,
       password  TEXT
     );
+    CREATE TABLE accounts (
+      id INTEGER PRIMARY KEY,
+      user_id INTEGER,
+      balance REAL,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    );
+    CREATE TABLE spaces (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      account_id INTEGER,
+      name TEXT,
+      color TEXT,
+      balance REAL,
+      goal_balance REAL,
+      is_default BOOLEAN,
+      FOREIGN KEY(account_id) REFERENCES accounts(id)
+    );
+    CREATE TABLE rules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tag TEXT,
+      percentage INTEGER,
+      space_id INTEGER,
+      FOREIGN KEY(space_id) REFERENCES spaces(id)
+    );
+    CREATE TABLE transactions (
+      id INTEGER PRIMARY KEY,
+      first_party INTEGER,
+      second_party TEXT,
+      tag TEXT,
+      amount REAL,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(first_party) REFERENCES accounts(id)
+    );
+    CREATE TABLE system_state (
+        id INTEGER PRIMARY KEY,
+        key TEXT UNIQUE,
+        value TEXT
+    );
   `);
 
   // Seed user and account
   const insertUser = db.prepare('INSERT INTO users (id, username, password) VALUES (?, ?, ?)');
-  const userInfo = insertUser.run(1, 'alice', 'password');
+  const userInfo = insertUser.run(1, 'max', 'max');
+
+  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, balance) VALUES (?, ?, ?)');
+  const accountInfo = insertAccount.run(1, 1, 0);
+
+  const insertSpace = db.prepare('INSERT INTO spaces (account_id, name, color, balance, goal_balance, is_default) VALUES (?, ?, ?, ?, ?, ?)');
+  const spaceInfo = insertSpace.run(1, 'Space 1', '#ffaaee', 0, 0, 1);
+  const spaceInfo2 = insertSpace.run(1, 'Space 2', '#ffaaef', 0, 0, 1);
+
+  const insertTransaction = db.prepare('INSERT INTO transactions (id, first_party, second_party, tag, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)');
+  const transactionInfo = insertTransaction.run(1, 1, 'Billa', 'Essen und Trinken', 10, "2025-06-02T23:58:57.147Z");
 
   console.log('Database initialized with sample data.');
 }

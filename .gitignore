@@ -4,6 +4,9 @@
 # Database
 *.db
 
+# open drawio
+files/.$*.drawio.bkp
+
 # Logs
 logs
 *.log
