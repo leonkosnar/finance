@@ -9,7 +9,7 @@ type Props = {
   color: string;
 };
 
-export default function GoalsCard({ title, amount, goalAmount, color }: Props) {
+export default function GoalsCard({ title, amount, goalAmount, color }: Props) {  
   return (
     <View style={[styles.card, { backgroundColor: color }]}>
       <View style={styles.header}>
@@ -19,7 +19,11 @@ export default function GoalsCard({ title, amount, goalAmount, color }: Props) {
           <Progress.Bar
             width={200}
             height={28}
-            progress={0.5}
+            progress={
+              Number(goalAmount) > 0
+                ? Math.min(Number(amount) / Number(goalAmount), 1)
+                : 0
+            }
             color={color}
             unfilledColor="#E0E0E0"
             borderWidth={0}

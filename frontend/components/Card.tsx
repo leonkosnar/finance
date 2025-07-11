@@ -15,7 +15,7 @@ export default function AccountCard({ id, title, amount, color, onPress }: Props
     data: transactions,
     loading: transactionsLoading,
     error: transactionsError,
-  } = useApi(`http://localhost:3000/transactions?limit=4&offset=0&account=${id}`);
+  } = useApi(`http://localhost:3000/transactions?limit=4&offset=0&account=${id}`, {}, "transactions", true);
 
   return (
     <TouchableOpacity
@@ -26,7 +26,7 @@ export default function AccountCard({ id, title, amount, color, onPress }: Props
       <View>
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.amount}>{amount} €</Text>
+          <Text style={styles.amount}>{amount.toFixed(2)} €</Text>
         </View>
         <View style={styles.body}>
           {transactionsLoading && <ActivityIndicator size="small" />}
@@ -44,7 +44,7 @@ export default function AccountCard({ id, title, amount, color, onPress }: Props
                 },
                 index: React.Key
               ) => {
-                const negative = amount < 0;
+                const isPositive = tx.amount > 0;
                 return (
                   <View key={index} style={styles.transactionRow}>
                     <View style={styles.left}>
@@ -53,10 +53,10 @@ export default function AccountCard({ id, title, amount, color, onPress }: Props
                     </View>
                     <Text style={[
                         styles.amountValue,
-                        negative ? styles.incoming : styles.outgoing,
+                        isPositive ? styles.incoming : styles.outgoing,
                       ]}
                     >
-                      {negative ? '+' : '-'}{tx.amount.toFixed(2)} €
+                      {isPositive ? '+' : ''}{tx.amount.toFixed(2)} €
                     </Text>
                   </View>
                 );

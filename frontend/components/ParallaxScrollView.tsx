@@ -26,7 +26,12 @@ export default function ParallaxScrollView({
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
-  const bottom = useBottomTabOverflow();
+  let bottom = 0;
+  try {
+    bottom = useBottomTabOverflow?.() ?? 0;
+  } catch {
+    bottom = 0;
+  }
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [

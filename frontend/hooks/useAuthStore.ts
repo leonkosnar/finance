@@ -10,12 +10,12 @@ type AuthState = {
   login: ( username: string, password: string, bankPassword: string ) => Promise<void>;
   logout: () => Promise<void>;
   loadStoredCredentials: () => Promise<void>;
-  loadNames: () => Promise<{ firstname: string | null; lastname: string | null }>;
+  loadNames: () => Promise<{ firstname: string | null; lastname: string | null; username: string | null}>;
   loadUserInputs: () => Promise<{ username: string | null; bankPassword: string | null }>;
 };
 
 const isDev = __DEV__;
-const secureStore = {
+export const secureStore = {
   async save(username: string, token: string, bankPassword: string, firstname: string, lastname: string) {
     if (isDev) {
       await AsyncStorage.multiSet([
@@ -77,6 +77,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   loadNames: async () => {
     const creds = await secureStore.load();
     return {
+      username: creds?.username ?? null,
       firstname: creds?.firstname ?? null,
       lastname: creds?.lastname ?? null,
     };
@@ -117,9 +118,3 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: null, token: null });
   },
 }));
-
-AppState.addEventListener("change", async (state) => {
-  if (state === "background") {
-    await secureStore.clear();
-  }
-});

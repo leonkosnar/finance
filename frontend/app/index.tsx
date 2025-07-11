@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { registerAppStateListener } from "@/utils/appLifecycle";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,6 +30,7 @@ export default function Index() {
     check();
   }, []);
 
+  registerAppStateListener();
   if (!isReady) return null;
 
   return <StatusBar style="auto" />;

@@ -4,20 +4,16 @@ import { View, Text, StyleSheet } from "react-native";
 type Props = {
   key: number;
   title: string;
-  amount: number | string;
-  goalAmount: number | string;
+  amount: number;
   color: string;
 };
 
-export default function SpaceCard({ title, amount, goalAmount, color }: Props) {
+export default function SpaceCard({ title, amount, color }: Props) {
   return (
     <View style={[styles.card, { backgroundColor: color }]}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.amount}>{amount} €</Text>
-        <View style={styles.body}>
-          <Text style={styles.subtitle}>Ziel: {goalAmount}</Text>
-        </View>
+        <Text style={styles.amount}>{amount.toFixed(2)} €</Text>
       </View>
     </View>
   );
