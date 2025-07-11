@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, View, Text, ActivityIndicator, Pressable } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import Card from '@/components/Card';
 import { useApi } from '@/hooks/useAPI';
 import { useAuthStore } from '@/hooks/useAuthStore';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import CardSpace from '@/components/CardSpace';
 import { Space } from '@/constants/types';
 
@@ -26,7 +26,14 @@ export default function BankAccountScreen() {
     data: account,
     loading: accountsLoading,
     error: accountsError,
+    refetch,
   } = useApi('http://localhost:3000/account', {}, "account");
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   const router = useRouter();
   return (
@@ -61,6 +68,10 @@ export default function BankAccountScreen() {
               onPress={() => router.push(`/detail/space/${space.id}/space`)}
             />
           ))}
+
+          <Pressable style={styles.button} onPress={() => router.push('/create/space')}>
+            <Text style={styles.buttonText}>Neuen Space anlegen</Text>
+          </Pressable>
       </View>
     </ParallaxScrollView>
   );
@@ -94,5 +105,25 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#3BA8A0',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    alignSelf: 'center',
+    marginVertical: 10
+  },
+  buttonText: {
+    color: '#FAF6E1',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
