@@ -121,7 +121,7 @@ export default function AccountDetailScreen() {
                     onPress={() => setTargetSpaceId(item.id)}
                   >
                     <Text style={styles.spaceName}>{item.name}</Text>
-                    <Text style={styles.spaceBalance}>Balance: {item.balance}</Text>
+                    <Text style={styles.spaceBalance}>Balance: {Math.round(item.balance)}</Text>
                   </TouchableOpacity>
                 )}
               />
