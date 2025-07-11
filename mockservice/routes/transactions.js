@@ -3,7 +3,8 @@ const db = require('../db');
 const router = express.Router();
 const auth = require('../middleware/auth');
 
-router.get('/transactions', auth, (req, res) => {
+router.get('/transactions', (req, res) => {
+  // youd normaly only allow admin or system user
   const last_id = req.query?.last_id || 0;
 
   const statement = [`

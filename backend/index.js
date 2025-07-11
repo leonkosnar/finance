@@ -5,6 +5,9 @@ const transaction = require('./routes/transaction');
 const spaces = require('./routes/spaces');
 const admin = require('./routes/admin');
 
+const { sync_accounts, sync_transactions } = require('./syncDB');
+
+
 const app = express();
 app.use(express.json());
 
@@ -16,6 +19,13 @@ app.use(account);
 app.use(transaction);
 app.use(spaces);
 app.use(admin);
+
+setTimeout(async()=>{
+  const acc = await sync_accounts();
+  const tra = await sync_transactions();
+
+  console.debug(`fetched ${acc} new accounts and ${tra} new transactions`)
+})
 
 app.listen(3000, () => {
   console.log('APP running at http://localhost:3000');
