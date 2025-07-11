@@ -12,7 +12,7 @@ router.get('/spaces', auth, (req, res) => {
     if (!accountId) return res.status(400).json({ error: 'account_id is required' });
 
     const spaces = db.prepare('SELECT * FROM spaces WHERE account_id = ?').all(accountId);
-    if (!spaces) return res.status(500);
+    if (!spaces) return res.status(500).send();
     res.json(spaces);
 });
 
@@ -32,7 +32,7 @@ router.post('/spaces', auth, (req, res) => {
                  VALUES (?, ?, ?, ?)`;
 
     db.prepare(sql).run(account_id, name, color, goal_balance);
-    res.status(201);
+    res.status(201).send();
 });
 
 /**
@@ -51,7 +51,7 @@ router.delete('/spaces/:id', auth, (req, res) => {
         }
 
         db.prepare('DELETE FROM spaces WHERE id = ?').run(spaceId);
-        res.status(200);
+        res.status(200).send();
     });
 });
 
@@ -63,7 +63,7 @@ router.get('/rules', auth, (req, res) => {
     if (!spaceId) return res.status(400).json({ error: 'space_id is required' });
 
     const rules = db.prepare('SELECT * FROM rules WHERE space_id = ?').all(spaceId);
-    if (!rules) return res.status(500);
+    if (!rules) return res.status(500).send();
     res.json(rules);
 });
 

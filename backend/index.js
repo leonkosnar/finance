@@ -25,7 +25,7 @@ setTimeout(async()=>{
   const tra = await sync_transactions();
 
   console.debug(`fetched ${acc} new accounts and ${tra} new transactions`)
-}, 5000)
+}, 2000)
 
 app.listen(3000, () => {
   console.log('APP running at http://localhost:3000');

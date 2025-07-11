@@ -21,7 +21,8 @@ if (isNew) {
     CREATE TABLE accounts (
       id INTEGER PRIMARY KEY,
       user_id INTEGER,
-      name TEXT
+      name TEXT,
+      category_max TEXT
     );
     CREATE TABLE spaces (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,13 +61,26 @@ if (isNew) {
   const insertUser = db.prepare('INSERT INTO users (id, username, firstname, lastname, password) VALUES (?, ?, ?, ?, ?)');
   const userInfo = insertUser.run(1, 'max', "CJ", "Bacon", 'max');
 
-  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name) VALUES (?, ?, ?)');
-  const accountInfo = insertAccount.run(1, 1, "Girokonto");
+  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name, category_max) VALUES (?, ?, ?, ?)');
+  const accountInfo = insertAccount.run(1, 1, "Girokonto", JSON.stringify({
+     "Reisen": 0,
+     "Essen und Trinken": 0,
+     "Shopping": 0,
+     "Multimedia": 0,
+     "Freizeit": 0,
+     "Bildung": 0,
+     "Online Shopping": 0,
+     "Steuern": 0,
+     "Überweisung": 0,
+     "Nutzer": 0,
+     "Gehalt": 0,
+     "Andere": 0,
+  }));
 
   const insertSpace = db.prepare('INSERT INTO spaces (account_id, name, color, balance, goal_balance, is_default) VALUES (?, ?, ?, ?, ?, ?)');
   const spaceInfo = insertSpace.run(1, 'Geld Pool', '#aaaaee', 0, 0, 1);
   const spaceInfo2 = insertSpace.run(1, 'Steuer Konto', '#aa5599', 0, 0, 0);
-  
+
   const insertRule = db.prepare('INSERT INTO rules (tag, percentage, space_id) VALUES (?, ?, ?)');
   const ruleInfo = insertRule.run("Steuern", 100, 2);
 
