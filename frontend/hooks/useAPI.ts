@@ -16,7 +16,6 @@ export function useApi<T = any>(
   const effectiveCacheKey = cacheKey || url;
 
   useEffect(() => {
-    console.log("useApi fetch:", url, "append:", append, "cache:", effectiveCacheKey);
     let isMounted = true;
 
     const fetchData = async () => {

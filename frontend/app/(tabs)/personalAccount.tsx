@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#3BA8A0',
     paddingVertical: 14,
+    paddingHorizontal: 40,
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
@@ -144,6 +145,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    alignSelf: 'center',
   },
   buttonText: {
     color: '#FAF6E1',
