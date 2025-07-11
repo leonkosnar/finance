@@ -33,7 +33,7 @@ export default function BankAccountScreen() {
     data: account,
     loading: accountsLoading,
     error: accountsError,
-  } = useApi('http://localhost:3000/account');
+  } = useApi('http://localhost:3000/account', {}, "account");
 
   const router = useRouter();
   return (
@@ -65,7 +65,6 @@ export default function BankAccountScreen() {
               key={spaces.id}
               title={spaces.name}
               amount={spaces.balance}
-              goalAmount={spaces.goal_balance}
               color={spaces.color}
             />
           ))}

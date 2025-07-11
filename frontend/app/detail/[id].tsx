@@ -6,12 +6,11 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import Card from "@/components/Card";
 
 export default function AccountDetailScreen() {
-
   const {
     data: account,
     loading: accountLoading,
     error: accountError,
-  } = useApi('http://localhost:3000/account');
+  } = useApi('http://localhost:3000/account', {}, "account");
 
   if (accountLoading) return <ActivityIndicator />;
   if (accountError) return <Text>{accountError}</Text>;

@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "./useAuthStore";
+import { cacheData, loadCachedData } from "@/utils/cacheManager";
 
-export function useApi<T = any>(url: string, options: RequestInit = {}) {
+export function useApi<T = any>(
+  url: string,
+  options: RequestInit = {},
+  cacheKey?: string,
+  append: boolean = false
+) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const token = useAuthStore().token;
+
+  const effectiveCacheKey = cacheKey || url;
 
   useEffect(() => {
     let isMounted = true;
@@ -13,6 +21,12 @@ export function useApi<T = any>(url: string, options: RequestInit = {}) {
     const fetchData = async () => {
       try {
         setLoading(true);
+
+        const cached = await loadCachedData<T>(effectiveCacheKey);
+        if (cached && isMounted) {
+          setData(cached);
+        }
+
         const res = await fetch(url, {
           ...options,
           headers: {
@@ -20,9 +34,20 @@ export function useApi<T = any>(url: string, options: RequestInit = {}) {
             authorization: `Bearer ${token}`,
           },
         });
+
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const json = await res.json();
-        if (isMounted) setData(json);
+
+        if (isMounted) {
+          let newData = json;
+
+          if (append && Array.isArray(cached) && Array.isArray(json)) {
+            newData = [...cached, ...json];
+          }
+
+          setData(newData);
+          await cacheData(effectiveCacheKey, newData);
+        }
       } catch (err: any) {
         if (isMounted) setError(err.message || "Unknown error");
       } finally {
@@ -30,12 +55,14 @@ export function useApi<T = any>(url: string, options: RequestInit = {}) {
       }
     };
 
-    fetchData();
+    if (token) {
+      fetchData();
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [url]);
+  }, [url, JSON.stringify(options), token]);
 
   return { data, loading, error };
 }

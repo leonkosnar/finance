@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, TextInput, Text, Pressable } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,8 +9,21 @@ import { useAuthStore } from '@/hooks/useAuthStore';
 export default function PersonalAccountScreen() {
   const [infoOpen, setInfoOpen] = useState(true);
   const [pwOpen, setPwOpen] = useState(false);
-  const [logoutOpen, setLogoutOpen] = useState(false);
-   const { logout } = useAuthStore();
+  const { logout } = useAuthStore();
+
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [username, setUsername] = useState('');
+  const { loadNames } = useAuthStore();
+  useEffect(() => {
+    const loadSavedInputs = async () => {
+      const { firstname, lastname, username } = await loadNames();
+      if (firstname) setFirstname(firstname);
+      if (lastname) setLastname(lastname);
+      if (username) setUsername(username);
+    };
+    loadSavedInputs();
+  }, []);
 
   return (
     <ParallaxScrollView
@@ -27,20 +40,36 @@ export default function PersonalAccountScreen() {
         </Pressable>
         {infoOpen && (
           <View style={styles.sectionContent}>
+            <Text style={{ fontWeight: '600', color: '#0B3043', margin: 4}}>Vorname</Text>
             <TextInput
               style={styles.input}
-              value="maximilian.muster@gmail.com"
+              value={firstname}
+              editable={false}
+            />
+
+            <Text style={{ fontWeight: '600', color: '#0B3043', margin: 4}}>Nachname</Text>
+            <TextInput
+              style={styles.input}
+              value={lastname}
+              editable={false}
+            />
+
+            <Text style={{ fontWeight: '600', color: '#0B3043', margin: 4}}>Username</Text>
+            <TextInput
+              style={styles.input}
+              value={username}
               editable={false}
             />
           </View>
         )}
 
-        <Pressable style={styles.sectionHeader} onPress={() => setPwOpen(!pwOpen)}>
+        {/* <Pressable style={styles.sectionHeader} onPress={() => setPwOpen(!pwOpen)}>
           <Text style={styles.sectionTitle}>Passwort ändern</Text>
           <AntDesign name={pwOpen ? 'up' : 'down'} size={18} color="#333" />
         </Pressable>
         {pwOpen && (
           <View style={styles.sectionContent}>
+            <Text style={{ fontWeight: '600', color: '#0B3043', margin: 4}}>Passwort</Text>
             <TextInput
               style={styles.input}
               value="abcdefg"
@@ -48,22 +77,14 @@ export default function PersonalAccountScreen() {
               editable={false}
             />
           </View>
-        )}
-
-        <Pressable style={styles.sectionHeader} onPress={() => setLogoutOpen(!logoutOpen)}>
-          <Text style={styles.sectionTitle}>Logout</Text>
-          <AntDesign name={logoutOpen ? 'up' : 'down'} size={18} color="#333" />
+        )} */}
+        
+        <Pressable style={styles.button} onPress={async () => {
+          await logout();
+          router.replace('/login');
+        }}>
+          <Text style={styles.buttonText}>Logout</Text>
         </Pressable>
-        {logoutOpen && (
-          <View style={styles.sectionContent}>
-            <Pressable style={styles.button} onPress={async () => {
-              await logout();
-              router.replace('/login');
-            }}>
-              <Text style={styles.buttonText}>Logout</Text>
-            </Pressable>
-          </View>
-        )}
       </View>
     </ParallaxScrollView>
   );
@@ -101,18 +122,14 @@ const styles = StyleSheet.create({
   },
   sectionContent: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 4,
+    padding: 8,
     marginBottom: 12,
-    borderWidth: 1.5,
-    borderColor: '#B7D5C4',
-    gap: 12,
+    gap: 8,
   },
   input: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 14,
+    padding: 10,
     fontSize: 16,
     borderWidth: 1.5,
     borderColor: '#B7D5C4',
@@ -135,4 +152,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
