@@ -15,6 +15,14 @@ router.get('/spaces', auth, (req, res) => {
     if (!spaces) return res.status(500).send();
     res.json(spaces);
 });
+router.get('/space/:id', auth, (req, res) => {
+    const spaceId = req.params.id;
+    if (!spaceId) return res.status(400).json({ error: 'id is required' });
+
+    const spaces = db.prepare('SELECT * FROM spaces WHERE id = ?').get(spaceId);
+    if (!spaces) return res.status(500).send();
+    res.json(spaces);
+});
 
 /**
  * POST /spaces
@@ -63,34 +71,45 @@ router.get('/rules', auth, (req, res) => {
     if (!spaceId) return res.status(400).json({ error: 'space_id is required' });
 
     const rules = db.prepare('SELECT * FROM rules WHERE space_id = ?').all(spaceId);
+    const spaces = db.prepare('SELECT id, name FROM spaces WHERE account_id = ?').all(req.user);
     if (!rules) return res.status(500).send();
-    res.json(rules);
+    res.json({ rules: rules, spaces: spaces });
 });
 
 /**
  * POST /rules
  * Body: { tag, percentage, space_id }
  */
-router.post('/rules', auth, (req, res) => {
+router.post('/rule', auth, (req, res) => {
     const { tag, percentage, space_id } = req.body;
+    console.log(tag, percentage, space_id)
 
     if (!tag || !percentage || !space_id) {
+        console.debug("body incomplete")
         return res.status(400).json({ error: 'tag, percentage and space_id are required' });
     }
 
-    const sql = `INSERT INTO rules (tag, percentage, space_id) VALUES (?, ?, ?)`;
-    db.prepare(sql, [tag, percentage, space_id], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
+    try {
+        const sql = db.prepare(`INSERT INTO rules (tag, percentage, space_id) VALUES (?, ?, ?)`).run(tag, percentage, space_id);
+        console.debug(sql)
+
+        if (!sql) {
+            return res.status(500).json({ error: err.message });
+        }
         res.status(201).json({ id: this.lastID });
-    });
+    }
+    catch (e) {
+        console.debug(e)
+        res.status(500).json({ message: e });
+    }
 });
 
 /**
  * DELETE /rules/:id
  */
-router.delete('/rules/:id', auth, (req, res) => {
+router.delete('/rule/:id', auth, (req, res) => {
     const ruleId = req.params.id;
-
+    console.debug(`DELETE rule ${ruleId}`)
     db.prepare('DELETE FROM rules WHERE id = ?').run(ruleId)
     res.json({ success: true });
 });

@@ -80,9 +80,11 @@ if (isNew) {
   const insertSpace = db.prepare('INSERT INTO spaces (account_id, name, color, balance, goal_balance, is_default) VALUES (?, ?, ?, ?, ?, ?)');
   const spaceInfo = insertSpace.run(1, 'Geld Pool', '#aaaaee', 0, 0, 1);
   const spaceInfo2 = insertSpace.run(1, 'Steuer Konto', '#aa5599', 0, 0, 0);
+  const spaceInfo3 = insertSpace.run(1, 'Sparen', '#55aa55', 0, 10000, 0);
 
   const insertRule = db.prepare('INSERT INTO rules (tag, percentage, space_id) VALUES (?, ?, ?)');
   const ruleInfo = insertRule.run("Steuern", 100, 2);
+  const ruleInfo2 = insertRule.run("Gehalt", 20, 3);
 
   // const insertTransaction = db.prepare('INSERT INTO transactions (id, first_party, second_party, tag, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)');
   // const transactionInfo2 = insertTransaction.run(1, 1, 'Google', 'Gehalt', 1000, "2025-06-02T08:58:57.147Z");

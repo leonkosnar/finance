@@ -6,16 +6,9 @@ import { useApi } from '@/hooks/useAPI';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import { useRouter } from 'expo-router';
 import CardSpace from '@/components/CardSpace';
+import { Space } from '@/constants/types';
 
 export default function BankAccountScreen() {
-  type Space = {
-    id: number;
-    name: string;
-    is_default: boolean;
-    color: string;
-    balance: number;
-    goal_balance: number;
-  };
 
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
@@ -56,16 +49,16 @@ export default function BankAccountScreen() {
             title={account.account.name}
             amount={account.account.balance}
             color="#F4A986"
-            onPress={() => router.push(`/detail/${account.account.id}`)}
+            onPress={() => router.push(`/detail/account`)}
           /> 
           }
         {!accountsLoading &&
-          !accountsError && account.spaces.map((spaces: Space) => (
+          !accountsError && account.spaces.map((space: Space) => (
             <CardSpace
-              key={spaces.id}
-              title={spaces.name}
-              amount={spaces.balance}
-              color={spaces.color}
+              key={space.id}
+              space={space}
+              display_rules={false}
+              onPress={() => router.push(`/detail/space/${space.id}/space`)}
             />
           ))}
       </View>
