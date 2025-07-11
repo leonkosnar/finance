@@ -36,8 +36,8 @@ router.post('/spaces', auth, (req, res) => {
         return res.status(400).json({ error: 'account_id and name are required' });
     }
 
-    const sql = `INSERT INTO spaces (account_id, name, color, goal_balance)
-                 VALUES (?, ?, ?, ?)`;
+    const sql = `INSERT INTO spaces (account_id, name, color, balance, goal_balance, is_default)
+                 VALUES (?, ?, ?, 0, ?, 0)`;
 
     db.prepare(sql).run(account_id, name, color, goal_balance);
     res.status(201).send();
@@ -49,10 +49,12 @@ router.post('/spaces', auth, (req, res) => {
  */
 router.delete('/spaces/:id', auth, (req, res) => {
     const spaceId = req.params.id;
+    try {
+        const row = db.prepare('SELECT is_default FROM spaces WHERE id = ?').get(spaceId);
 
-    db.prepare('SELECT is_default FROM spaces WHERE id = ?', [spaceId], (err, row) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (!row) return res.status(404).json({ error: 'Space not found' });
+        if (!row) {
+            return res.status(404).json({ error: 'Space not found' });
+        }
 
         if (row.is_default) {
             return res.status(403).json({ error: 'Cannot delete default space' });
@@ -60,7 +62,10 @@ router.delete('/spaces/:id', auth, (req, res) => {
 
         db.prepare('DELETE FROM spaces WHERE id = ?').run(spaceId);
         res.status(200).send();
-    });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 /**
