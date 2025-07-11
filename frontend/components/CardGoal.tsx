@@ -14,7 +14,7 @@ export default function GoalsCard({ title, amount, goalAmount, color }: Props) {
     <View style={[styles.card, { backgroundColor: color }]}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.amount}>{amount} €</Text>
+        <Text style={styles.amount}>{Math.round(amount as number)} €</Text>
         <View style={styles.body}>
           <Progress.Bar
             width={200}

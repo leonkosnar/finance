@@ -17,8 +17,9 @@ export default function GoalsScreen() {
   };
 
   const getLevel = (spaces: Space[]) => {
-    const percent = spaces.filter(s => s.goal_balance > 0).reduce((a, space) => a + ((100 / space.goal_balance) * space.balance), 0)
-    if (percent > 90) return { title: "Level 5: Sparprofi" }
+    const sp = spaces.filter(s => s.goal_balance > 0)
+    const percent = sp.reduce((a, space) => a + Math.min(Math.max(100 / Number(space.goal_balance) * Number(space.balance), 0), 100), 0) / sp.length
+    if (percent > 90) return { title: `Level 5: Sparprofi ${sp.length}` }
     if (percent > 70) return { title: "Level 4: Sparktakulär" }
     if (percent > 50) return { title: "Level 3: Spartastisch" }
     if (percent > 30) return { title: "Level 2: Sparzubi" }
