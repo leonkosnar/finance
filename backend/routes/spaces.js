@@ -119,4 +119,23 @@ router.delete('/rule/:id', auth, (req, res) => {
     res.json({ success: true });
 });
 
+router.post('/move', auth, (req, res) => {
+    const { src, dst, amt } = req.body;
+    try {
+        const updateBalances = db.transaction(() => {
+            const from = db.prepare('UPDATE spaces SET balance = balance - ? WHERE id = ?').run(amt, src);
+            const to = db.prepare('UPDATE spaces SET balance = balance + ? WHERE id = ?').run(amt, dst);
+        });
+
+        const result = updateBalances()
+
+        console.debug(result)
+        return res.status(200).send()
+    }
+    catch (e){
+        console.error(e)
+        res.status(500).send()
+    }
+})
+
 module.exports = router;
