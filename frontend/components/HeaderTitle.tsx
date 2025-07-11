@@ -1,13 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { Text, StyleSheet, View } from "react-native";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 type Props = {
   title: string;
 };
 
 export default function HeaderTitle({ title }: Props) {
+  const color = useThemeColor({}, "primary");
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{title}</Text>
+      <Text style={[styles.text, { color }]}>{title}</Text>
     </View>
   );
 }

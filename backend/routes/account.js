@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/account', auth, async (req, res) => {
     const accountId = req.user;
     try{
-        const account = db.prepare('SELECT balance FROM accounts WHERE user_id = ?').get(accountId);
+        const account = db.prepare('SELECT * FROM accounts WHERE user_id = ?').get(accountId);
         const transactions = db.prepare('SELECT * FROM transactions WHERE first_party = ? LIMIT 5').all(accountId);
         const spaces = db.prepare('SELECT * FROM spaces WHERE account_id = ?').all(accountId);
         console.log(accountId, account, transactions, spaces)

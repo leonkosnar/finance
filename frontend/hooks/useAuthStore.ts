@@ -7,51 +7,54 @@ type AuthState = {
   user: string | null;
   token: string | null;
   isLoading: boolean;
-  login: (
-    username: string,
-    password: string,
-    bankPassword: string
-  ) => Promise<void>;
+  login: ( username: string, password: string, bankPassword: string ) => Promise<void>;
   logout: () => Promise<void>;
   loadStoredCredentials: () => Promise<void>;
+  loadNames: () => Promise<{ firstname: string | null; lastname: string | null }>;
+  loadUserInputs: () => Promise<{ username: string | null; bankPassword: string | null }>;
 };
 
 const isDev = __DEV__;
 const secureStore = {
-  async save(username: string, token: string, bankPassword: string) {
+  async save(username: string, token: string, bankPassword: string, firstname: string, lastname: string) {
     if (isDev) {
       await AsyncStorage.multiSet([
         ["username", username],
         ["token", token],
         ["bankPassword", bankPassword],
+        ["firstname", firstname],
+        ["lastname", lastname]
       ]);
     } else {
       await Keychain.setGenericPassword(username, token);
-      await Keychain.setInternetCredentials(
-        "bankPassword",
-        username,
-        bankPassword
-      );
+      await Keychain.setInternetCredentials("bankPassword", username, bankPassword);
+      await Keychain.setInternetCredentials("firstname", username, firstname);
+      await Keychain.setInternetCredentials("lastname", username, lastname);
     }
   },
 
   async load() {
     if (isDev) {
-      const [username, token, bankPassword] = await Promise.all([
+      const [username, token, bankPassword, firstname, lastname] = await Promise.all([
         AsyncStorage.getItem("username"),
         AsyncStorage.getItem("token"),
         AsyncStorage.getItem("bankPassword"),
+        AsyncStorage.getItem("firstname"),
+        AsyncStorage.getItem("lastname"),
       ]);
-      if (!username || !token || !bankPassword) return null;
-      return { username, token, bankPassword };
+      return { username, token, bankPassword, firstname, lastname };
     } else {
       const creds = await Keychain.getGenericPassword();
       const bank = await Keychain.getInternetCredentials("bankPassword");
-      if (!creds || !bank) return null;
+      const firstname = await Keychain.getInternetCredentials("firstname");
+      const lastname = await Keychain.getInternetCredentials("lastname");
+      if (!creds || !bank || !firstname || !lastname) return null;
       return {
         username: creds.username,
         token: creds.password,
         bankPassword: bank.password,
+        firstname: firstname.password,
+        lastname: lastname.password
       };
     }
   },
@@ -71,6 +74,22 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   isLoading: true,
 
+  loadNames: async () => {
+    const creds = await secureStore.load();
+    return {
+      firstname: creds?.firstname ?? null,
+      lastname: creds?.lastname ?? null,
+    };
+  },
+
+  loadUserInputs: async () => {
+    const creds = await secureStore.load();
+    return {
+      username: creds?.username ?? null,
+      bankPassword: creds?.bankPassword ?? null,
+    };
+  },
+
   loadStoredCredentials: async () => {
     const creds = await secureStore.load();
     if (creds) {
@@ -89,7 +108,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (!res.ok) throw new Error("Login failed");
 
     const data = await res.json();
-    await secureStore.save(username, data.token, bankPassword);
+    await secureStore.save(username, data.token, bankPassword, data.firstname, data.lastname);
     set({ user: username, token: data.token });
   },
 

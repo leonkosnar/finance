@@ -13,14 +13,15 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            borderTopWidth: 0,
+            elevation: 0,
+            backgroundColor: 'transparent',
           },
           default: {},
         }),
@@ -29,21 +30,21 @@ export default function TabsLayout() {
         name="bankAccount"
         options={{
           title: 'Konten',
-          tabBarIcon: ({ color }) => <Ionicons name="wallet" size={32} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="wallet" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="goals"
         options={{
-          title: 'Konten',
-          tabBarIcon: ({ color }) => <Ionicons name="medal" size={32} color={color} />,
+          title: 'Ziele',
+          tabBarIcon: ({ color }) => <Ionicons name="medal" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="personalAccount"
         options={{
           title: 'Account',
-          tabBarIcon: ({ color }) => <Ionicons name="person" size={32} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="person" size={26} color={color} />,
         }}
       />
     </Tabs>

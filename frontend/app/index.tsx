@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
@@ -15,10 +15,8 @@ export default function Index() {
     const check = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
-        if (token) {
+        if (!token) {
           router.replace('/welcome');
-        } else {
-          router.replace('/login')
         }
       } catch (e) {
         console.error('Fehler bei Login-Check:', e);

@@ -10,18 +10,18 @@ import Animated, {
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import React from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const HEADER_HEIGHT = 140;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
 }>;
 
 export default function ParallaxScrollView({
   children,
   headerImage,
-  headerBackgroundColor,
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -54,11 +54,15 @@ export default function ParallaxScrollView({
         <Animated.View
           style={[
             styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
             headerAnimatedStyle,
           ]}>
+          <LinearGradient
+            colors={['#FAF6E1', '#B7D5C4']}
+            style={StyleSheet.absoluteFill}
+          />
           {headerImage}
         </Animated.View>
+
         <ThemedView style={styles.content}>{children}</ThemedView>
       </Animated.ScrollView>
     </ThemedView>

@@ -19,13 +19,9 @@ export default function RootLayout() {
         await loadStoredCredentials();
         await SplashScreen.hideAsync();
 
-        const username = await AsyncStorage.getItem('username');
         const token = await AsyncStorage.getItem('token');
-        const bankPassword = await AsyncStorage.getItem('bankPassword');
-        console.log("username: ", username, "token: ", token, "bankPassword: ", bankPassword, "router: ", router);
         if (!token) {
           router.replace('/welcome');
-          console.log("weiterleiten")
         }
       }
     });

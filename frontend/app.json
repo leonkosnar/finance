@@ -9,12 +9,16 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "adaptiveIcon":{
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#FAF6E1"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FAF6E1"
       }
     },
     "web": {
@@ -27,10 +31,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#FAF6E1"
         }
       ]
     ],

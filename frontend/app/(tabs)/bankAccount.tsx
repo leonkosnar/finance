@@ -1,19 +1,43 @@
-import React from "react";
-import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import Card from "@/components/Card";
-import { useApi } from "@/hooks/useAPI";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
+import Card from '@/components/Card';
+import { useApi } from '@/hooks/useAPI';
+import { useAuthStore } from '@/hooks/useAuthStore';
+import { useRouter } from 'expo-router';
+import CardSpace from '@/components/CardSpace';
 
 export default function BankAccountScreen() {
+  type Space = {
+    id: number;
+    name: string;
+    is_default: boolean;
+    color: string;
+    balance: number;
+    goal_balance: number;
+  };
+
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const { loadNames } = useAuthStore();
+  useEffect(() => {
+    const loadSavedInputs = async () => {
+      const { firstname, lastname } = await loadNames();
+      if (firstname) setFirstname(firstname);
+      if (lastname) setLastname(lastname);
+    };
+    loadSavedInputs();
+  }, []);
+
   const {
-    data: accounts,
+    data: account,
     loading: accountsLoading,
     error: accountsError,
-  } = useApi("http://localhost:3000/account");
+  } = useApi('http://localhost:3000/account');
 
+  const router = useRouter();
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: "#0B3043", dark: "#0B3043" }}
       headerImage={
         <View style={styles.headerImageContainer}>
           <Text style={styles.headerText}>Konten</Text>
@@ -21,56 +45,62 @@ export default function BankAccountScreen() {
       }
     >
       <View style={styles.container}>
+        <Text style={styles.title}>{("Willkommen, " + firstname + " " + lastname + "!")}</Text>
+
         {accountsLoading && <ActivityIndicator size="large" />}
-        {accountsError && <Text style={{ color: "red" }}>{accountsError}</Text>}
+        {accountsError && <Text style={styles.errorText}>{accountsError}</Text>}
         {!accountsLoading &&
           !accountsError &&
-          accounts.map(
-            (
-              account: {
-                id: number;
-                user_id: number;
-                name: string;
-                tag: string;
-                balance: number;
-                color: string;
-              },
-              idx: React.Key | null | undefined
-            ) => (
-              <Card
-                key={idx}
-                id={account.id}
-                title={account.name}
-                amount={account.balance}
-                color={account.color}
-              />
-            )
-          )}
+          <Card
+            id={0}
+            title={account.account.name}
+            amount={account.account.balance}
+            color="#F4A986"
+            onPress={() => router.push(`/detail/${account.account.id}`)}
+          /> 
+          }
+        {!accountsLoading &&
+          !accountsError && account.spaces.map((spaces: Space) => (
+            <CardSpace
+              key={spaces.id}
+              title={spaces.name}
+              amount={spaces.balance}
+              goalAmount={spaces.goal_balance}
+              color={spaces.color}
+            />
+          ))}
       </View>
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: "#A85757",
-    paddingTop: 70,
-    paddingBottom: 30,
-    paddingHorizontal: 20,
-  },
   headerImageContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 15,
+    position: 'absolute',
+    bottom: 24,
+    left: 20,
     right: 0,
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
   },
   headerText: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#0A2E3D',
   },
   container: {
-    gap: 8,
+    gap: 20,
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#0A2E3D',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
   },
 });

@@ -21,6 +21,7 @@ if (isNew) {
     CREATE TABLE accounts (
       id INTEGER PRIMARY KEY,
       user_id INTEGER,
+      name TEXT,
       balance REAL
     );
     CREATE TABLE spaces (
@@ -60,8 +61,8 @@ if (isNew) {
   const insertUser = db.prepare('INSERT INTO users (id, username, firstname, lastname, password) VALUES (?, ?, ?, ?, ?)');
   const userInfo = insertUser.run(1, 'max', "CJ", "Bacon", 'max');
 
-  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, balance) VALUES (?, ?, ?)');
-  const accountInfo = insertAccount.run(1, 1, 0);
+  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name, balance) VALUES (?, ?, ?, ?)');
+  const accountInfo = insertAccount.run(1, 1, "Girokonto", 0);
 
   const insertSpace = db.prepare('INSERT INTO spaces (account_id, name, color, balance, goal_balance, is_default) VALUES (?, ?, ?, ?, ?, ?)');
   const spaceInfo = insertSpace.run(1, 'Space 1', '#ffaaee', 0, 0, 1);
