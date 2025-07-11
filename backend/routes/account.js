@@ -12,7 +12,7 @@ router.get('/account', auth, async (req, res) => {
         const spaces = db.prepare('SELECT * FROM spaces WHERE account_id = ?').all(accountId);
         console.log(accountId, account, transactions, spaces)
         if (!account) return res.status(500);
-        return res.json({account:{...account, spaces:spaces}, transactions:transactions});
+        return res.json({account:{...account, transactions:transactions}, spaces:spaces});
     }
     catch{
         res.status(500)
