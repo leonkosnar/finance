@@ -28,7 +28,7 @@ export default function GoalsCard({ title, amount, goalAmount, color }: Props) {
             unfilledColor="#E0E0E0"
             borderWidth={0}
           />
-          <Text style={styles.subtitle}>Ziel: {goalAmount}</Text>
+          <Text style={styles.subtitle}>Ziel: {goalAmount} ({100 / Number(goalAmount) * Number(amount)}%)</Text>
         </View>
       </View>
     </View>
