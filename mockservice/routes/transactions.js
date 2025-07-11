@@ -4,8 +4,6 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 
 router.get('/transactions', auth, (req, res) => {
-  const limit = req.query?.limit || 10;
-  const offset = req.query?.offset || 0;
   const last_id = req.query?.last_id || 0;
 
   const statement = [`
@@ -21,13 +19,11 @@ router.get('/transactions', auth, (req, res) => {
     JOIN accounts a_source ON t.first_party = a_source.id
     JOIN accounts a_dest ON t.second_party = a_dest.id
     WHERE t.id > ${last_id}
-    LIMIT ? 
-    OFFSET ?
   `].join("");
 
   console.debug(statement)
 
-  const transactions = db.prepare(statement).all(limit, offset);
+  const transactions = db.prepare(statement).all();
   res.json(transactions);
 });
 

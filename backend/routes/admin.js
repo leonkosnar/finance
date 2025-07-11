@@ -25,7 +25,7 @@ router.get('/sync/accounts', auth, async (req, res) => {
     try {
         const lastId = 0;
         const response = await axios.get(`http://localhost:3001/accounts?last_id=${lastId}`, {
-            headers: {"authorization": `Bearer ${req.bank_jwt}`}
+            headers: { "authorization": `Bearer ${req.bank_jwt}` }
         });
         const accounts = response.data;
 
@@ -48,7 +48,9 @@ router.get('/sync/accounts', auth, async (req, res) => {
 router.post('/sync/transactions', auth, async (req, res) => {
     try {
         const lastId = getLastTransactionId();
-        const response = await axios.get(`http://localhost:3001/transactions?last_id=${lastId}`);
+        const response = await axios.get(`http://localhost:3001/transactions?last_id=${lastId}`, {
+            headers: { "authorization": `Bearer ${req.bank_jwt}` }
+        });
         const transactions = response.data;
 
         if (transactions.length === 0) {
@@ -58,10 +60,6 @@ router.post('/sync/transactions', auth, async (req, res) => {
         const insertTx = db.prepare(`
       INSERT INTO transactions (id, first_party, second_party, tag, amount, timestamp)
       VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-        const updateAccount = db.prepare(`
-      UPDATE accounts SET balance = balance + ? WHERE id = ?
     `);
 
         const updateSpace = db.prepare(`
@@ -96,9 +94,6 @@ router.post('/sync/transactions', auth, async (req, res) => {
                 if (defaultSpace) {
                     updateSpace.run(remaining, defaultSpace.id);
                 }
-
-                // Update account balance
-                updateAccount.run(amount, first_party);
 
                 // Insert into local transactions table
                 insertTx.run(transaction_id, first_party, second_party, tag, amount, timestamp);

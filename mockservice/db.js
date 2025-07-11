@@ -99,14 +99,20 @@ if (isNew) {
   })
   
   const insertTransaction = db.prepare('INSERT INTO transactions (first_party, second_party, payment_ref, amount, timestamp) VALUES (?, ?, ?, ?, ?)');
-  for(let i = 0; i < 100; i++){
-    const transaction = getTransaction(1)
-    insertTransaction.run(transaction.first_party, transaction.second_party, transaction.message, transaction.amount, transaction.timestamp)
-  }
-  for(let i = 0; i < 20; i++){
-    const transaction = getTransaction(2)
-    insertTransaction.run(transaction.source_account, transaction.destination_account, transaction.message, transaction.amount, transaction.timestamp)
-  }
+  insertTransaction.run(1, 202, tags.SALARY, 4000, randomDate().toISOString())
+  insertTransaction.run(1, 107, tags.TAXES, -800, randomDate().toISOString())
+  insertTransaction.run(1, 202, tags.SALARY, 2000, randomDate().toISOString())
+  insertTransaction.run(1, 107, tags.TAXES, -200, randomDate().toISOString())
+
+  // for(let i = 0; i < 100; i++){
+  //   const transaction = getTransaction(1)
+  //   insertTransaction.run(transaction.first_party, transaction.second_party, transaction.message, transaction.amount, transaction.timestamp)
+  // }
+  // for(let i = 0; i < 20; i++){
+  //   const transaction = getTransaction(2)
+  //   insertTransaction.run(transaction.source_account, transaction.destination_account, transaction.message, transaction.amount, transaction.timestamp)
+  // }
+  
   console.log('Database initialized with sample data.');
 }
 
