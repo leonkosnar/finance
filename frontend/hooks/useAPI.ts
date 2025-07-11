@@ -16,6 +16,7 @@ export function useApi<T = any>(
   const effectiveCacheKey = cacheKey || url;
 
   useEffect(() => {
+    console.log("useApi fetch:", url, "append:", append, "cache:", effectiveCacheKey);
     let isMounted = true;
 
     const fetchData = async () => {
@@ -23,7 +24,7 @@ export function useApi<T = any>(
         setLoading(true);
 
         const cached = await loadCachedData<T>(effectiveCacheKey);
-        if (cached && isMounted) {
+        if (cached && isMounted && !append) {
           setData(cached);
         }
 
@@ -39,14 +40,11 @@ export function useApi<T = any>(
         const json = await res.json();
 
         if (isMounted) {
-          let newData = json;
+          setData(json);
 
-          if (append && Array.isArray(cached) && Array.isArray(json)) {
-            newData = [...cached, ...json];
+          if (!append) {
+            await cacheData(effectiveCacheKey, json);
           }
-
-          setData(newData);
-          await cacheData(effectiveCacheKey, newData);
         }
       } catch (err: any) {
         if (isMounted) setError(err.message || "Unknown error");
