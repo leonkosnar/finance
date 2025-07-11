@@ -10,8 +10,10 @@ router.get('/account', auth, (req, res) => {
     res.json(accounts);
 });
 
-router.get('/accounts', (req, res) => {
-    const accounts = db.prepare('SELECT * FROM accounts').all();
+router.get('/accounts', auth, (req, res) => {
+  const last_id = req.query?.last_id || 0;
+
+    const accounts = db.prepare(`SELECT * FROM accounts WHERE id > ${last_id}`).all();
     res.json(accounts);
 });
 

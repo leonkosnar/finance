@@ -22,16 +22,16 @@ router.get('/spaces', auth, (req, res) => {
  */
 router.post('/spaces', auth, (req, res) => {
     const account_id = req.user;
-    const { name, color, balance = 0, goal_balance = 0 } = req.body;
+    const { name, color, goal_balance = 0 } = req.body;
 
     if (!account_id || !name) {
         return res.status(400).json({ error: 'account_id and name are required' });
     }
 
-    const sql = `INSERT INTO spaces (account_id, name, color, balance, goal_balance)
-                 VALUES (?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO spaces (account_id, name, color, goal_balance)
+                 VALUES (?, ?, ?, ?)`;
 
-    db.prepare(sql).run(account_id, name, color, balance, goal_balance);
+    db.prepare(sql).run(account_id, name, color, goal_balance);
     res.status(201);
 });
 

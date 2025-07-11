@@ -14,13 +14,14 @@ if (isNew) {
     CREATE TABLE users (
       id INTEGER PRIMARY KEY,
       username TEXT,
+      firstname TEXT,
+      lastname TEXT,
       password  TEXT
     );
     CREATE TABLE accounts (
       id INTEGER PRIMARY KEY,
       user_id INTEGER,
-      balance REAL,
-      FOREIGN KEY(user_id) REFERENCES users(id)
+      balance REAL
     );
     CREATE TABLE spaces (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,15 +57,15 @@ if (isNew) {
   `);
 
   // Seed user and account
-  const insertUser = db.prepare('INSERT INTO users (id, username, password) VALUES (?, ?, ?)');
-  const userInfo = insertUser.run(1, 'max', 'max');
+  const insertUser = db.prepare('INSERT INTO users (id, username, firstname, lastname, password) VALUES (?, ?, ?, ?, ?)');
+  const userInfo = insertUser.run(1, 'max', "CJ", "Bacon", 'max');
 
   const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, balance) VALUES (?, ?, ?)');
   const accountInfo = insertAccount.run(1, 1, 0);
 
   const insertSpace = db.prepare('INSERT INTO spaces (account_id, name, color, balance, goal_balance, is_default) VALUES (?, ?, ?, ?, ?, ?)');
   const spaceInfo = insertSpace.run(1, 'Space 1', '#ffaaee', 0, 0, 1);
-  const spaceInfo2 = insertSpace.run(1, 'Space 2', '#ffaaef', 0, 0, 1);
+  const spaceInfo2 = insertSpace.run(1, 'Space 2', '#ffaaef', 0, 0, 0);
 
   const insertTransaction = db.prepare('INSERT INTO transactions (id, first_party, second_party, tag, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)');
   const transactionInfo = insertTransaction.run(1, 1, 'Billa', 'Essen und Trinken', 10, "2025-06-02T23:58:57.147Z");
