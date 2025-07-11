@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import CardBadge from '@/components/CardBadge';
 import CardGoal from '@/components/CardGoal';
 import { useApi } from '@/hooks/useAPI';
+import { useFocusEffect } from 'expo-router';
 
 export default function GoalsScreen() {
   type Space = {
@@ -29,7 +30,14 @@ export default function GoalsScreen() {
     data: spaces,
     loading: spacesLoading,
     error: spacesError,
+    refetch
   } = useApi('http://localhost:3000/spaces', {}, "spaces");
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   if (spacesLoading) return <ActivityIndicator />;
   if (spacesError) return <Text>{spacesError}</Text>;

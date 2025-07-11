@@ -125,7 +125,9 @@ export default function SpaceCard({
                         <Text>
                           [{rule.tag}] Transaktionen werden zu [{rule.percentage}%] diesem Space zugewiesen.
                         </Text>
-                        <Button onPress={() => deleteRule(rule.id)} title="Löschen" />
+                        <Pressable onPress={() => deleteRule(rule.id)}>
+                          <Text style={styles.buttonText}>Löschen</Text>
+                        </Pressable>
                       </View>
                     </View>
                   ))
@@ -236,7 +238,7 @@ const styles = StyleSheet.create({
   transaction: {
     flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   error: {
     color: "red",
@@ -251,7 +253,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#007AFF',
-    margin: 10,
+    marginTop: 10,
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
