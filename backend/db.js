@@ -21,8 +21,7 @@ if (isNew) {
     CREATE TABLE accounts (
       id INTEGER PRIMARY KEY,
       user_id INTEGER,
-      name TEXT,
-      balance REAL
+      name TEXT
     );
     CREATE TABLE spaces (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,15 +60,16 @@ if (isNew) {
   const insertUser = db.prepare('INSERT INTO users (id, username, firstname, lastname, password) VALUES (?, ?, ?, ?, ?)');
   const userInfo = insertUser.run(1, 'max', "CJ", "Bacon", 'max');
 
-  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name, balance) VALUES (?, ?, ?, ?)');
-  const accountInfo = insertAccount.run(1, 1, "Girokonto", 0);
+  const insertAccount = db.prepare('INSERT INTO accounts (id, user_id, name) VALUES (?, ?, ?)');
+  const accountInfo = insertAccount.run(1, 1, "Girokonto");
 
   const insertSpace = db.prepare('INSERT INTO spaces (account_id, name, color, balance, goal_balance, is_default) VALUES (?, ?, ?, ?, ?, ?)');
   const spaceInfo = insertSpace.run(1, 'Space 1', '#ffaaee', 0, 0, 1);
   const spaceInfo2 = insertSpace.run(1, 'Space 2', '#ffaaef', 0, 0, 0);
 
   const insertTransaction = db.prepare('INSERT INTO transactions (id, first_party, second_party, tag, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)');
-  const transactionInfo = insertTransaction.run(1, 1, 'Billa', 'Essen und Trinken', 10, "2025-06-02T23:58:57.147Z");
+  const transactionInfo2 = insertTransaction.run(1, 1, 'Google', 'Gehalt', 1000, "2025-06-02T08:58:57.147Z");
+  const transactionInfo = insertTransaction.run(2, 1, 'Billa', 'Essen und Trinken', -10, "2025-06-02T23:58:57.147Z");
 
   console.log('Database initialized with sample data.');
 }
