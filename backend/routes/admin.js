@@ -21,7 +21,7 @@ function setLastTransactionId(id) {
 }
 
 // Fetch new accounts (optional)
-router.get('/sync/accounts', auth, async (req, res) => {
+router.post('/sync/accounts', auth, async (req, res) => {
     try {
         const lastId = 0;
         const response = await axios.get(`http://localhost:3001/accounts?last_id=${lastId}`, {
@@ -29,7 +29,7 @@ router.get('/sync/accounts', auth, async (req, res) => {
         });
         const accounts = response.data;
 
-        const stmt = db.prepare(`INSERT OR IGNORE INTO accounts (id, user_id, balance) VALUES (?, ?, 0)`);
+        const stmt = db.prepare(`INSERT OR IGNORE INTO accounts (id, user_id) VALUES (?, ?)`);
         const insertMany = db.transaction((accounts) => {
             for (const acc of accounts) {
                 stmt.run(acc.id, acc.user_id);
