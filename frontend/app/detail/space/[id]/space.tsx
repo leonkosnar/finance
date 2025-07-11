@@ -1,11 +1,24 @@
 import { useRouter } from "expo-router";
-import { StyleSheet, View, Text, ActivityIndicator, Button, Modal, TouchableOpacity, FlatList, TextInput } from "react-native";
-import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ActivityIndicator,
+  Button,
+  Modal,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  Pressable,
+  Alert,
+  ScrollView,
+} from "react-native";
+import React, { useState } from "react";
 import { useApi } from "@/hooks/useAPI";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import CardSpace from "@/components/CardSpace";
 import { useLocalSearchParams } from "expo-router";
-import { useApiMutation } from '@/hooks/useAPIMutation';
+import { useApiMutation } from "@/hooks/useAPIMutation";
 
 export default function AccountDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -29,19 +42,19 @@ export default function AccountDetailScreen() {
   const { mutate } = useApiMutation();
 
   if (spaceLoading || allSpacesLoading) return <ActivityIndicator />;
-  if (spaceError) return <Text>{spaceError}</Text>;
-  if (allSpacesError) return <Text>{allSpacesError}</Text>;
-  if (!space) return <Text>Kein Space gefunden</Text>;
+  if (spaceError) return <Text style={styles.errorText}>{spaceError}</Text>;
+  if (allSpacesError) return <Text style={styles.errorText}>{allSpacesError}</Text>;
+  if (!space) return <Text style={styles.errorText}>Kein Space gefunden</Text>;
 
   const targetSpaces = allSpaces.filter((s: any) => s.id !== Number(id));
 
   const doTransfer = async () => {
     if (!targetSpaceId) {
-      alert("Bitte Zielkonto wählen!");
+      Alert.alert("Fehler", "Bitte Zielkonto wählen!");
       return;
     }
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      alert("Bitte gültigen Betrag eingeben!");
+      Alert.alert("Fehler", "Bitte gültigen Betrag eingeben!");
       return;
     }
 
@@ -55,11 +68,11 @@ export default function AccountDetailScreen() {
     setIsMoving(false);
 
     if (error) {
-      alert(`Fehler bei Überweisung: ${error}`);
+      Alert.alert("Fehler bei Überweisung", error);
       return;
     }
 
-    alert("Überweisung erfolgreich!");
+    Alert.alert("Erfolg", "Überweisung erfolgreich!");
     setModalVisible(false);
     setAmount("");
     setTargetSpaceId(null);
@@ -74,24 +87,31 @@ export default function AccountDetailScreen() {
         </View>
       }
     >
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <CardSpace
           space={space}
           display_rules={true}
-          onPress={() => console.log("Detail")}
+          onPress={() => {}}
         />
 
-        <Button title="Geld Überweisen" onPress={() => setModalVisible(true)} />
+        <Pressable
+          style={styles.primaryButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.primaryButtonText}>Geld Überweisen</Text>
+        </Pressable>
 
-        <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <Modal visible={modalVisible} animationType="fade" transparent={true}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Überweisung</Text>
 
-              <Text>Zielkonto wählen:</Text>
+              <Text style={styles.label}>Zielkonto wählen:</Text>
               <FlatList
                 data={targetSpaces}
                 keyExtractor={(item) => item.id.toString()}
+                style={{ maxHeight: 250, marginBottom: 15 }}
+                showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={[
@@ -100,13 +120,13 @@ export default function AccountDetailScreen() {
                     ]}
                     onPress={() => setTargetSpaceId(item.id)}
                   >
-                    <Text>{item.name}</Text>
-                    <Text>Balance: {item.balance}</Text>
+                    <Text style={styles.spaceName}>{item.name}</Text>
+                    <Text style={styles.spaceBalance}>Balance: {item.balance}</Text>
                   </TouchableOpacity>
                 )}
               />
 
-              <Text>Betrag:</Text>
+              <Text style={styles.label}>Betrag:</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
@@ -116,24 +136,31 @@ export default function AccountDetailScreen() {
               />
 
               <View style={styles.buttonRow}>
-                <Button
-                  title="Abbrechen"
+                <Pressable
+                  style={[styles.secondaryButton]}
                   onPress={() => {
                     setModalVisible(false);
                     setAmount("");
                     setTargetSpaceId(null);
                   }}
-                />
-                <Button
-                  title={isMoving ? "Überweise..." : "Überweisen"}
+                >
+                  <Text style={styles.secondaryButtonText}>Abbrechen</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.primaryButton, isMoving && styles.disabledButton]}
                   onPress={doTransfer}
                   disabled={isMoving}
-                />
+                >
+                  <Text style={styles.primaryButtonText}>
+                    {isMoving ? "Überweise..." : "Überweisen"}
+                  </Text>
+                </Pressable>
               </View>
             </View>
           </View>
         </Modal>
-      </View>
+      </ScrollView>
     </ParallaxScrollView>
   );
 }
@@ -152,13 +179,53 @@ const styles = StyleSheet.create({
     color: "#0A2E3D",
   },
   container: {
+    paddingHorizontal: 16,
+    paddingVertical: 20,
     gap: 20,
-    paddingHorizontal: 5,
-    paddingVertical: 10,
   },
   errorText: {
     color: "red",
     fontSize: 16,
+    textAlign: "center",
+    marginTop: 20,
+  },
+  primaryButton: {
+    backgroundColor: "#3BA8A0",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  primaryButtonText: {
+    color: "#FAF6E1",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  secondaryButton: {
+    backgroundColor: "#ccc",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  secondaryButtonText: {
+    color: "#444",
+    fontSize: 16,
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
   modalOverlay: {
     flex: 1,
@@ -168,30 +235,50 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "white",
-    borderRadius: 10,
+    borderRadius: 16,
     padding: 20,
     maxHeight: "80%",
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 15,
+    color: "#0A2E3D",
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    color: "#0B3043",
+    fontWeight: "600",
   },
   spaceItem: {
-    padding: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#eee",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderRadius: 8,
   },
   selectedSpaceItem: {
-    backgroundColor: "#ddd",
+    backgroundColor: "#F4A98620",
+  },
+  spaceName: {
+    fontSize: 16,
+    color: "#0A2E3D",
+  },
+  spaceBalance: {
+    fontSize: 14,
+    color: "#3BA8A0",
+    fontWeight: "600",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#aaa",
-    borderRadius: 5,
-    padding: 8,
-    marginTop: 5,
-    marginBottom: 15,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 20,
+    fontSize: 16,
   },
   buttonRow: {
     flexDirection: "row",
